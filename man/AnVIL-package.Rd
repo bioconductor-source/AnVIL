@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Marcel Ramos \email{marcel.ramos@sph.cuny.edu} (\href{https://orcid.org/0000-0002-3242-0582}{ORCID})
   \item Martin Morgan (\href{https://orcid.org/0000-0002-5874-8148}{ORCID})
   \item Kayla Interdonato
   \item Yubo Cheng
