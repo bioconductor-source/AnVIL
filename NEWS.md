@@ -1,3 +1,13 @@
+# AnVIL 1.26.0
+
+USER VISIBLE CHANGES
+
+- (v 1.25.3) Add `api_reference_sha256` argument to `Service()` for
+  validating the API reference with a SHA-256 digest;
+  `api_reference_md5sum` validates with an MD5 digest again. For backward
+  compatibility, a 64-character `api_reference_md5sum` is treated as a
+  SHA-256 digest.
+
 # AnVIL 1.24.0
 
 NEW FEATURES
