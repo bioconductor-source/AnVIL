@@ -103,3 +103,64 @@ test_that("Terra API reference version is constant", {
         )
     )
 })
+
+test_that(".service_validate_digest checks md5 and sha256 digests", {
+    api_file <- tempfile(fileext = ".json")
+    writeLines('{"info": {"version": "1.0"}}', api_file)
+    on.exit(unlink(api_file))
+    md5 <- unname(tools::md5sum(api_file))
+    sha256 <- digest::digest(api_file, algo = "sha256", file = TRUE)
+    url <- paste0("https://example.org/", basename(api_file))
+
+    expect_null(
+        .service_validate_digest(url, character(), NULL, api_file, "md5")
+    )
+    expect_true(
+        .service_validate_digest(url, md5, NULL, api_file, algo = "md5")
+    )
+    expect_true(
+        .service_validate_digest(url, sha256, NULL, api_file, algo = "sha256")
+    )
+    ## mismatches warn once per url and algorithm
+    bad_url <- paste0(url, "?mismatch")
+    expect_warning(
+        res <- .service_validate_digest(
+            bad_url, sha256, NULL, api_file, algo = "md5"
+        ),
+        "observed md5"
+    )
+    expect_false(res)
+    expect_silent(
+        .service_validate_digest(bad_url, sha256, NULL, api_file, algo = "md5")
+    )
+    expect_warning(
+        .service_validate_digest(bad_url, md5, NULL, api_file, algo = "sha256"),
+        "observed sha256"
+    )
+})
+
+test_that("Service validates api_reference_md5sum and api_reference_sha256", {
+    api_file <- tempfile(fileext = ".json")
+    writeLines(
+        '{"swagger": "2.0", "info": {"version": "1.0"}, "paths": {}}',
+        api_file
+    )
+    on.exit(unlink(api_file))
+    md5 <- unname(tools::md5sum(api_file))
+    sha256 <- digest::digest(api_file, algo = "sha256", file = TRUE)
+    service <- function(...)
+        Service(
+            "test", host = "example.org", authenticate = FALSE,
+            api_url = api_file,
+            api_reference_url = paste0("file://", api_file), ...
+        )
+
+    expect_s4_class(service(api_reference_md5sum = md5), "Service")
+    expect_silent(service(api_reference_md5sum = md5))
+    expect_silent(service(api_reference_sha256 = sha256))
+    expect_silent(
+        service(api_reference_md5sum = md5, api_reference_sha256 = sha256)
+    )
+    ## backward compatibility: sha256 digest supplied as md5sum
+    expect_silent(service(api_reference_md5sum = sha256))
+})
