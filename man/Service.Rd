@@ -14,6 +14,7 @@ Service(
   schemes = "https",
   api_reference_url = api_url,
   api_reference_md5sum = character(),
+  api_reference_sha256 = character(),
   api_reference_version = character(),
   api_reference_headers = NULL,
   ...
@@ -44,7 +45,13 @@ transfer protocol supported by the API service.}
 Details.}
 
 \item{api_reference_md5sum}{\code{character(1)} the result of
-\code{tools::md5sum()} applied to the reference API.}
+\code{tools::md5sum()} applied to the reference API. For backward
+compatibility, a 64-character value is treated as a SHA-256
+digest, i.e., as \code{api_reference_sha256}.}
+
+\item{api_reference_sha256}{\code{character(1)} the SHA-256 digest, e.g.,
+from \code{digest::digest(file, algo = "sha256", file = TRUE)}, of the
+reference API.}
 
 \item{api_reference_version}{\code{character(1)} the version of the
 reference API. This is used to check that the version of the
@@ -75,9 +82,10 @@ package, at \verb{<package>/inst/service/<service>/api.json}, or at
 keyring using `anvil_set_auth_json()`.
 }\if{html}{\out{</div>}}
 
-When provided, the \code{api_reference_md5sum} is used to check that
-the file described at \code{api_reference_url} has the same checksum
-as an author-validated version.
+When provided, the \code{api_reference_md5sum} and / or
+\code{api_reference_sha256} are used to check that the file described at
+\code{api_reference_url} has the same checksum as an author-validated
+version.
 
 The service is usually a singleton, created at the package
 level during \code{.onLoad()}.

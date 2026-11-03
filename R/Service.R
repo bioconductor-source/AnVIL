@@ -34,28 +34,33 @@ setOldClass("request")
     fl
 }
 
-.service_validate_sha256_warn <- new.env(parent = emptyenv())
+.service_validate_digest_warn <- new.env(parent = emptyenv())
 
-.service_validate_sha256 <-
-    function(reference_url, reference_sha256, reference_headers, api_file)
+.service_validate_digest <-
+    function(
+        reference_url, reference_digest, reference_headers, api_file,
+        algo = c("sha256", "md5")
+    )
 {
+    algo <- match.arg(algo)
     flog.debug("Service reference url: %s", reference_url)
-    flog.debug("Service reference sha256: %s", reference_sha256)
+    flog.debug("Service reference %s: %s", algo, reference_digest)
 
-    if (length(reference_sha256) == 0L)
+    if (length(reference_digest) == 0L)
         return()
 
-    sha256 <- digest::digest(api_file, algo = "sha256", file = TRUE)
+    digest <- digest::digest(api_file, algo = algo, file = TRUE)
+    warn_key <- paste0(algo, ":", reference_url)
     test <-
-        identical(unname(sha256), reference_sha256) ||
-        exists(reference_url, envir = .service_validate_sha256_warn)
-    .service_validate_sha256_warn[[reference_url]] <- TRUE
+        identical(unname(digest), reference_digest) ||
+        exists(warn_key, envir = .service_validate_digest_warn)
+    .service_validate_digest_warn[[warn_key]] <- TRUE
     if (!test)
         warning(
             "service version differs from validated version",
             "\n    service url: ", reference_url,
-            "\n    observed sha256: ", sha256,
-            "\n    expected sha256: ", reference_sha256
+            "\n    observed ", algo, ": ", digest,
+            "\n    expected ", algo, ": ", reference_digest
         )
     test
 }
@@ -120,7 +125,13 @@ setOldClass("request")
 #'     Details.
 #'
 #' @param api_reference_md5sum `character(1)` the result of
-#'     `tools::md5sum()` applied to the reference API.
+#'     `tools::md5sum()` applied to the reference API. For backward
+#'     compatibility, a 64-character value is treated as a SHA-256
+#'     digest, i.e., as `api_reference_sha256`.
+#'
+#' @param api_reference_sha256 `character(1)` the SHA-256 digest, e.g.,
+#'     from `digest::digest(file, algo = "sha256", file = TRUE)`, of the
+#'     reference API.
 #'
 #' @param api_reference_version `character(1)` the version of the
 #'    reference API. This is used to check that the version of the
@@ -143,9 +154,10 @@ setOldClass("request")
 #'     Authentication credentials can be stored securely in the system
 #'     keyring using `anvil_set_auth_json()`.
 #'
-#' When provided, the `api_reference_md5sum` is used to check that
-#' the file described at `api_reference_url` has the same checksum
-#' as an author-validated version.
+#' When provided, the `api_reference_md5sum` and / or
+#' `api_reference_sha256` are used to check that the file described at
+#' `api_reference_url` has the same checksum as an author-validated
+#' version.
 #'
 #' The service is usually a singleton, created at the package
 #' level during `.onLoad()`.
@@ -168,6 +180,7 @@ Service <-
         api_url = character(), package = "AnVIL", schemes = "https",
         api_reference_url = api_url,
         api_reference_md5sum = character(),
+        api_reference_sha256 = character(),
         api_reference_version = character(),
         api_reference_headers = NULL,
         ...
@@ -181,6 +194,8 @@ Service <-
             isScalarCharacter(api_reference_url),
         length(api_reference_md5sum) == 0L ||
             isScalarCharacter(api_reference_md5sum),
+        length(api_reference_sha256) == 0L ||
+            isScalarCharacter(api_reference_sha256),
         length(api_reference_version) == 0L ||
             isScalarCharacter(api_reference_version),
         is.null(api_reference_headers) || isCharacter(api_reference_headers)
@@ -189,9 +204,22 @@ Service <-
 
     api_file <- .service_get_api_file(api_reference_url, api_reference_headers)
 
-    .service_validate_sha256(
+    ## backward compatibility: AnVIL (v 1.23.10) used SHA-256 digests in
+    ## 'api_reference_md5sum'
+    if (length(api_reference_md5sum) && nchar(api_reference_md5sum) == 64L) {
+        if (!length(api_reference_sha256))
+            api_reference_sha256 <- api_reference_md5sum
+        api_reference_md5sum <- character()
+    }
+
+    .service_validate_digest(
         api_reference_url, api_reference_md5sum,
-        api_reference_headers, api_file
+        api_reference_headers, api_file, algo = "md5"
+    )
+
+    .service_validate_digest(
+        api_reference_url, api_reference_sha256,
+        api_reference_headers, api_file, algo = "sha256"
     )
 
     .service_validate_version(
