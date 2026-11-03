@@ -35,51 +35,75 @@ exportMethods(schemas)
 exportMethods(show)
 import(futile.logger)
 import(methods)
-importFrom(AnVILBase,avstop_for_status)
-importFrom(AnVILBase,avtable)
-importFrom(AnVILBase,avtables)
-importFrom(AnVILBase,avworkspace)
-importFrom(AnVILBase,avworkspace_name)
-importFrom(AnVILBase,avworkspaces)
-importFrom(BiocBaseUtils,checkInstalled)
-importFrom(BiocBaseUtils,isCharacter)
-importFrom(BiocBaseUtils,isScalarCharacter)
-importFrom(BiocBaseUtils,isScalarLogical)
-importFrom(DT,DTOutput)
-importFrom(DT,datatable)
-importFrom(DT,formatStyle)
-importFrom(DT,renderDT)
+importFrom(AnVILBase,
+  avstop_for_status,
+  avtable,
+  avtables,
+  avworkspace,
+  avworkspace_name,
+  avworkspaces
+)
+importFrom(BiocBaseUtils,
+  checkInstalled,
+  isCharacter,
+  isScalarCharacter,
+  isScalarLogical
+)
+importFrom(DT,
+  DTOutput,
+  datatable,
+  formatStyle,
+  renderDT
+)
 importFrom(GCPtools,gcloud_access_token)
-importFrom(dplyr,arrange)
-importFrom(dplyr,filter)
-importFrom(dplyr,full_join)
-importFrom(dplyr,select)
-importFrom(htmltools,p)
-importFrom(htmltools,strong)
-importFrom(httr,GET)
-importFrom(httr,add_headers)
-importFrom(httr,oauth2.0_token)
-importFrom(httr,oauth_app)
-importFrom(httr,oauth_endpoints)
-importFrom(httr,write_disk)
+importFrom(dplyr,
+  arrange,
+  filter,
+  full_join,
+  select
+)
+importFrom(htmltools,
+  p,
+  strong
+)
+importFrom(httr,
+  GET,
+  add_headers,
+  oauth2.0_token,
+  oauth_app,
+  oauth_endpoints,
+  write_disk
+)
 importFrom(jsonlite,read_json)
-importFrom(keyring,key_get)
-importFrom(keyring,key_list)
-importFrom(keyring,key_set_with_value)
-importFrom(miniUI,gadgetTitleBar)
-importFrom(miniUI,miniContentPanel)
-importFrom(miniUI,miniPage)
-importFrom(rapiclient,get_api)
-importFrom(rapiclient,get_operations)
-importFrom(rapiclient,get_schemas)
-importFrom(shiny,observeEvent)
-importFrom(shiny,renderText)
-importFrom(shiny,runGadget)
-importFrom(shiny,stopApp)
-importFrom(shiny,textOutput)
+importFrom(keyring,
+  key_get,
+  key_list,
+  key_set_with_value
+)
+importFrom(miniUI,
+  gadgetTitleBar,
+  miniContentPanel,
+  miniPage
+)
+importFrom(rapiclient,
+  get_api,
+  get_operations,
+  get_schemas
+)
+importFrom(shiny,
+  observeEvent,
+  renderText,
+  runGadget,
+  stopApp,
+  textOutput
+)
 importFrom(stats,setNames)
-importFrom(tibble,as_tibble)
-importFrom(tibble,tibble)
-importFrom(utils,.DollarNames)
-importFrom(utils,browseURL)
-importFrom(utils,head)
+importFrom(tibble,
+  as_tibble,
+  tibble
+)
+importFrom(utils,
+  .DollarNames,
+  browseURL,
+  head
+)
