@@ -11,7 +11,7 @@
 #'   `?GCPtools::gcloud_access_token()` for details.
 #'
 #' @aliases .DollarNames.Service operations,Service-method
-#'     schemas,Service-method show,Service-method Service-class
+#' @aliases schemas,Service-method show,Service-method Service-class
 NULL
 
 #' @rdname Services
